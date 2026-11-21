@@ -1642,6 +1642,43 @@ if ($accion === "agregar_contenido") {
     }
 
     $q = $conexion->prepare(
+        "SELECT nombre, cantidad_stock, estado
+         FROM implemento
+         WHERE id_implemento = ?"
+    );
+
+    $q->bind_param("i", $id_implemento);
+    $q->execute();
+    $item = $q->get_result()->fetch_assoc();
+    $q->close();
+
+    if (!$item) {
+        volver(
+            "implemento",
+            "El implemento seleccionado no existe.",
+            "error",
+            ["id" => $id_contenedor]
+        );
+    }
+
+    $stock_disponible =
+        $item["estado"] === "Fuera de servicio"
+        ? 0
+        : (int)$item["cantidad_stock"];
+
+    if ($cantidad > $stock_disponible) {
+        volver(
+            "implemento",
+            $item["nombre"] .
+            " no tiene stock suficiente. Disponible: " .
+            $stock_disponible .
+            ".",
+            "error",
+            ["id" => $id_contenedor]
+        );
+    }
+
+    $q = $conexion->prepare(
         "INSERT INTO contenido_contenedor
         (
             id_contenedor,
