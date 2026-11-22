@@ -515,6 +515,13 @@ $resumen = $conexion->query(
                     <div class="panel-head">
                         <div>
                             <h2>Inventario actual</h2>
+                            <a
+                                class="accion-mini"
+                                href="exportar_inventario.php"
+                                style="margin-top:10px;"
+                            >
+                                Exportar CSV
+                            </a>
                             <p><span id="contador_inventario"><?php echo $implementos->num_rows; ?></span> registros encontrados.</p>
                         </div>
                     </div>
