@@ -92,10 +92,11 @@ $resumen = $conexion->query(
         .buscador-seccion { padding:14px 18px; border-bottom:1px solid #e2e8f0; background:#fff; }
         .buscador-seccion input { width:100%; min-height:42px; padding:10px 13px; border:1px solid #cbd5e1; border-radius:9px; background:#f8fafc; color:#0f172a; outline:none; }
         .buscador-seccion input:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.10); background:#fff; }
+        .filtros-inventario { display:grid; grid-template-columns:minmax(0,1fr) 180px 155px 185px auto; gap:9px; align-items:end; }
+        .filtros-inventario label, .filtros-historial label { color:#334155; font-size:9px; font-weight:700; }
+        .filtros-inventario input, .filtros-inventario select, .filtros-historial input, .filtros-historial select { width:100%; min-height:38px; margin-top:5px; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; color:#0f172a; outline:none; }
+        .filtros-inventario input:focus, .filtros-inventario select:focus, .filtros-historial input:focus, .filtros-historial select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.08); }
         .filtros-historial { display:grid; grid-template-columns:minmax(0,1fr) 190px 170px auto; gap:9px; align-items:end; }
-        .filtros-historial label { color:#334155; font-size:9px; font-weight:700; }
-        .filtros-historial input, .filtros-historial select { width:100%; min-height:38px; margin-top:5px; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; color:#0f172a; outline:none; }
-        .filtros-historial input:focus, .filtros-historial select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.08); }
         .boton-limpiar-filtros { min-height:38px; padding:0 12px; border:1px solid #cbd5e1; border-radius:8px; background:#f8fafc; color:#334155; font-size:10px; font-weight:700; cursor:pointer; }
         .boton-limpiar-filtros:hover { background:#f1f5f9; }
         .acordeon-lista { padding:14px 18px 18px; display:grid; gap:10px; }
@@ -174,7 +175,7 @@ $resumen = $conexion->query(
         .form-gestion-incidencia select:focus, .form-gestion-incidencia textarea:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.08); }
         .form-gestion-incidencia .gestion-acciones { grid-column:1 / -1; }
 
-        @media (max-width:760px) { .fila-implemento { grid-template-columns:1fr; } .resumen-devolucion { grid-template-columns:1fr; } .gestion-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .subacordeon-contenido { grid-template-columns:1fr; } .item-gestion-resumen { align-items:flex-start; } .form-gestion-incidencia { grid-template-columns:1fr; } .gestion-actual { grid-template-columns:1fr; } .gestion-observacion-actual { grid-column:auto; } .filtros-historial { grid-template-columns:1fr; } }
+        @media (max-width:760px) { .fila-implemento { grid-template-columns:1fr; } .resumen-devolucion { grid-template-columns:1fr; } .gestion-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .subacordeon-contenido { grid-template-columns:1fr; } .item-gestion-resumen { align-items:flex-start; } .form-gestion-incidencia { grid-template-columns:1fr; } .gestion-actual { grid-template-columns:1fr; } .gestion-observacion-actual { grid-column:auto; } .filtros-inventario { grid-template-columns:1fr; } .filtros-historial { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
@@ -514,16 +515,62 @@ $resumen = $conexion->query(
                     <div class="panel-head">
                         <div>
                             <h2>Inventario actual</h2>
-                            <p><?php echo $implementos->num_rows; ?> registros encontrados.</p>
+                            <p><span id="contador_inventario"><?php echo $implementos->num_rows; ?></span> registros encontrados.</p>
                         </div>
                     </div>
 
                     <div class="buscador-seccion">
-                        <input
-                            type="search"
-                            placeholder="Buscar por codigo, nombre, categoria, tipo o estado..."
-                            data-buscador="lista_inventario"
-                        >
+                        <div class="filtros-inventario">
+                            <label>
+                                Buscar
+                                <input
+                                    type="search"
+                                    id="busqueda_inventario"
+                                    placeholder="Código, nombre o descripción..."
+                                >
+                            </label>
+
+                            <label>
+                                Categoría
+                                <select id="filtro_categoria_inventario">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="Vestuario staff">Vestuario staff</option>
+                                    <option value="Material promocional">Material promocional</option>
+                                    <option value="Mobiliario y montaje">Mobiliario y montaje</option>
+                                    <option value="Contenedores y kits">Contenedores y kits</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Tipo
+                                <select id="filtro_tipo_inventario">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="Reutilizable">Reutilizable</option>
+                                    <option value="Consumible">Consumible</option>
+                                    <option value="Contenedor">Contenedor</option>
+                                </select>
+                            </label>
+
+                            <label>
+                                Estado
+                                <select id="filtro_estado_inventario">
+                                    <option value="">Todos los estados</option>
+                                    <option value="Disponible">Disponible</option>
+                                    <option value="Disponibilidad parcial">Disponibilidad parcial</option>
+                                    <option value="No disponible">No disponible</option>
+                                    <option value="Fuera de servicio">Fuera de servicio</option>
+                                </select>
+                            </label>
+
+                            <button
+                                type="button"
+                                class="boton-limpiar-filtros"
+                                id="limpiar_filtros_inventario"
+                            >
+                                Limpiar
+                            </button>
+                        </div>
                     </div>
 
                     <?php if ($implementos->num_rows === 0): ?>
@@ -572,7 +619,7 @@ $resumen = $conexion->query(
                                     ?>
 
                                     <tr
-                                        class="elemento-busqueda"
+                                        class="elemento-busqueda fila-inventario"
                                         data-buscar="<?php echo h(
                                             'IMP-' . str_pad((string)$i['id_implemento'], 3, '0', STR_PAD_LEFT) . ' ' .
                                             $i['nombre'] . ' ' .
@@ -581,6 +628,9 @@ $resumen = $conexion->query(
                                             $i['tipo_control'] . ' ' .
                                             $estado
                                         ); ?>"
+                                        data-categoria="<?php echo h($i['categoria']); ?>"
+                                        data-tipo="<?php echo h($i['tipo_control']); ?>"
+                                        data-estado="<?php echo h($estado); ?>"
                                     >
                                         <td>
                                             IMP-<?php echo str_pad(
@@ -2487,6 +2537,109 @@ document.querySelectorAll("[data-buscador]").forEach((campo) => {
         });
     });
 });
+
+const busquedaInventario = document.getElementById("busqueda_inventario");
+const filtroCategoriaInventario = document.getElementById("filtro_categoria_inventario");
+const filtroTipoInventario = document.getElementById("filtro_tipo_inventario");
+const filtroEstadoInventario = document.getElementById("filtro_estado_inventario");
+const limpiarFiltrosInventario = document.getElementById("limpiar_filtros_inventario");
+const contadorInventario = document.getElementById("contador_inventario");
+
+function filtrarInventario()
+{
+    const lista = document.getElementById("lista_inventario");
+
+    if (!lista) {
+        return;
+    }
+
+    const termino = normalizarBusqueda(
+        busquedaInventario ? busquedaInventario.value : ""
+    );
+
+    const categoria = filtroCategoriaInventario
+        ? filtroCategoriaInventario.value
+        : "";
+
+    const tipo = filtroTipoInventario
+        ? filtroTipoInventario.value
+        : "";
+
+    const estado = filtroEstadoInventario
+        ? filtroEstadoInventario.value
+        : "";
+
+    let visibles = 0;
+
+    lista.querySelectorAll(".fila-inventario").forEach((fila) => {
+        const contenido = normalizarBusqueda(
+            fila.dataset.buscar || fila.textContent
+        );
+
+        const coincideTexto =
+            termino === "" || contenido.includes(termino);
+
+        const coincideCategoria =
+            categoria === "" || fila.dataset.categoria === categoria;
+
+        const coincideTipo =
+            tipo === "" || fila.dataset.tipo === tipo;
+
+        const coincideEstado =
+            estado === "" || fila.dataset.estado === estado;
+
+        const mostrar =
+            coincideTexto && coincideCategoria && coincideTipo && coincideEstado;
+
+        fila.classList.toggle("oculto-busqueda", !mostrar);
+
+        if (mostrar) {
+            visibles++;
+        }
+    });
+
+    if (contadorInventario) {
+        contadorInventario.textContent = visibles;
+    }
+}
+
+if (busquedaInventario) {
+    busquedaInventario.addEventListener("input", filtrarInventario);
+}
+
+if (filtroCategoriaInventario) {
+    filtroCategoriaInventario.addEventListener("change", filtrarInventario);
+}
+
+if (filtroTipoInventario) {
+    filtroTipoInventario.addEventListener("change", filtrarInventario);
+}
+
+if (filtroEstadoInventario) {
+    filtroEstadoInventario.addEventListener("change", filtrarInventario);
+}
+
+if (limpiarFiltrosInventario) {
+    limpiarFiltrosInventario.addEventListener("click", () => {
+        if (busquedaInventario) {
+            busquedaInventario.value = "";
+        }
+
+        if (filtroCategoriaInventario) {
+            filtroCategoriaInventario.value = "";
+        }
+
+        if (filtroTipoInventario) {
+            filtroTipoInventario.value = "";
+        }
+
+        if (filtroEstadoInventario) {
+            filtroEstadoInventario.value = "";
+        }
+
+        filtrarInventario();
+    });
+}
 
 const busquedaHistorial = document.getElementById("busqueda_historial");
 const filtroTipoHistorial = document.getElementById("filtro_tipo_historial");
