@@ -81,6 +81,10 @@ $resumen = $conexion->query(
         .acciones-tabla { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:95px; }
         .accion-mini { display:inline-flex; align-items:center; justify-content:center; padding:6px 9px; border-radius:7px; font-size:10px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
         .accion-mini:hover { background:#dbeafe; }
+        .acciones-contenido { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .acciones-contenido form { margin:0; }
+        .accion-mini.peligro { background:#fff1f2; color:#b91c1c; border-color:#fecaca; cursor:pointer; }
+        .accion-mini.peligro:hover { background:#ffe4e6; }
         .datos-implemento { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:20px; }
         .dato-implemento { border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#f8fafc; }
         .dato-implemento span { display:block; color:#64748b; font-size:10px; margin-bottom:5px; }
@@ -875,6 +879,7 @@ $resumen = $conexion->query(
                     <?php
                     $contenido = $conexion->prepare(
                         "SELECT
+                            c.id_implemento,
                             c.cantidad,
                             i.nombre,
                             i.categoria
@@ -963,9 +968,25 @@ $resumen = $conexion->query(
                                                 <span><?php echo h($it['categoria']); ?></span>
                                             </div>
 
-                                            <span class="badge azul">
-                                                <?php echo (int)$it['cantidad']; ?> unidades
-                                            </span>
+                                            <div class="acciones-contenido">
+                                                <span class="badge azul">
+                                                    <?php echo (int)$it['cantidad']; ?> unidades
+                                                </span>
+
+                                                <form
+                                                    action="acciones.php"
+                                                    method="POST"
+                                                    onsubmit="return confirm('¿Quitar este implemento del contenedor?');"
+                                                >
+                                                    <input type="hidden" name="accion" value="eliminar_contenido">
+                                                    <input type="hidden" name="id_contenedor" value="<?php echo $id; ?>">
+                                                    <input type="hidden" name="id_implemento" value="<?php echo (int)$it['id_implemento']; ?>">
+
+                                                    <button class="accion-mini peligro" type="submit">
+                                                        Quitar
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     <?php endwhile; ?>
                                 </div>

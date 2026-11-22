@@ -1602,6 +1602,71 @@ if ($accion === "gestionar_incidencia") {
     }
 }
 
+if ($accion === "eliminar_contenido") {
+
+    $id_contenedor = (int)($_POST["id_contenedor"] ?? 0);
+    $id_implemento = (int)($_POST["id_implemento"] ?? 0);
+
+    if ($id_contenedor < 1 || $id_implemento < 1) {
+        volver(
+            "implementos",
+            "No se pudo identificar el contenido a quitar.",
+            "error"
+        );
+    }
+
+    $q = $conexion->prepare(
+        "SELECT tipo_control
+         FROM implemento
+         WHERE id_implemento = ?"
+    );
+
+    $q->bind_param("i", $id_contenedor);
+    $q->execute();
+    $contenedor = $q->get_result()->fetch_assoc();
+    $q->close();
+
+    if (!$contenedor || $contenedor["tipo_control"] !== "Contenedor") {
+        volver(
+            "implementos",
+            "El implemento seleccionado no es un contenedor.",
+            "error"
+        );
+    }
+
+    $q = $conexion->prepare(
+        "DELETE FROM contenido_contenedor
+         WHERE id_contenedor = ?
+           AND id_implemento = ?"
+    );
+
+    $q->bind_param(
+        "ii",
+        $id_contenedor,
+        $id_implemento
+    );
+
+    $q->execute();
+    $eliminados = $q->affected_rows;
+    $q->close();
+
+    if ($eliminados < 1) {
+        volver(
+            "implemento",
+            "El implemento ya no forma parte del contenedor.",
+            "error",
+            ["id" => $id_contenedor]
+        );
+    }
+
+    volver(
+        "implemento",
+        "Implemento quitado del contenedor correctamente.",
+        "ok",
+        ["id" => $id_contenedor]
+    );
+}
+
 if ($accion === "agregar_contenido") {
 
     $id_contenedor = (int)($_POST["id_contenedor"] ?? 0);
