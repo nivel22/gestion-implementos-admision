@@ -664,7 +664,14 @@ $resumen = $conexion->query(
 
                                         <td><?php echo $fuera; ?></td>
                                         <td><?php echo $reservado_hoy; ?></td>
-                                        <td><strong><?php echo $disponible; ?></strong></td>
+                                        <td>
+    <strong><?php echo $disponible; ?></strong>
+    <?php if ($disponible <= 5): ?>
+        <div style="margin-top:6px;">
+            <span class="badge amarillo">Stock bajo</span>
+        </div>
+    <?php endif; ?>
+</td>
 
                                         <td>
                                             <span class="badge <?php echo $clase; ?>">
